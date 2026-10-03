@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tapachula de Córdova y Ordóñez | Turismo y Rutas</title>
+  <meta name="description" content="Guía turística de Tapachula, Chiapas: Centro histórico, Ruta del Café, Cascadas de San Francisco y Puerto Chiapas.">
+  
+  <!-- Tipografía Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Hoja de Estilos CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAV-01: Barra de Navegación Superior -->
+  <header class="top-nav" id="topNav">
+    <div class="nav-container">
+      <a href="#inicio" class="brand-logo">
+        <div class="brand-icon">☕</div>
+        <div class="brand-text">
+          <span class="brand-title">Tapachula</span>
+          <span class="brand-subtitle">La Perla del Soconusco</span>
+        </div>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="#inicio" class="nav-link active">Inicio</a>
+        <a href="#rutas" class="nav-link">Rutas & Atractivos</a>
+        <a href="#mapa" class="nav-link">Mapa Municipal</a>
+        <a href="#directorio" class="nav-link">Directorio</a>
+        <a href="#cultura" class="nav-link">Cultura</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button id="openItineraryBtn" class="btn-itinerary" aria-label="Abrir mi itinerario">
+          <span>Mi Itinerario</span>
+          <span class="badge-count" id="itineraryCount">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner de Alerta / Simulación de Error -->
+  <aside class="error-banner is-hidden" id="errorBanner" role="alert">
+    <div class="banner-content">
+      <span class="banner-icon">⚠️</span>
+      <span class="banner-text" id="errorMessage">Error de conexión con el servicio de rutas. Intenta recargar o escribir otro término.</span>
+    </div>
+    <div class="banner-actions">
+      <button id="retryBtn" class="btn-banner">Reintentar</button>
+      <button id="dismissErrorBtn" class="btn-banner-close" aria-label="Cerrar alerta">&times;</button>
+    </div>
+  </aside>
+
+  <!-- HERO: Portada Principal con Fotografía -->
+  <section class="hero-section" id="inicio">
+    <div class="hero-bg-overlay"></div>
+    <div class="hero-container">
+      <div class="hero-kicker">Municipio de Tapachula · Chiapas, México</div>
+      <h1 class="hero-title">Tapachula de Córdova y Ordóñez</h1>
+      <p class="hero-description">
+        Descubre la riqueza de nuestro municipio: desde el patrimonio art déco del Parque Central y el MUTAP, hasta las fincas de café de altura en la sierra rural, cascadas cristalinas y los atardeceres en Puerto Chiapas.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="#rutas" class="btn btn-primary">Explorar Atractivos</a>
+        <button class="btn btn-glass" onclick="filterByCategory('cafe')">Ruta del Café (Sierra)</button>
+        <button class="btn btn-glass" onclick="filterByCategory('costa')">Puerto Chiapas (Costa)</button>
+      </div>
+
+      <div class="hero-metrics">
+        <div class="metric-item">
+          <span class="metric-number">1,250 m</span>
+          <span class="metric-label">Altitud cafetalera</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-number">28 km</span>
+          <span class="metric-label">Al litoral Pacífico</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-number">1547</span>
+          <span class="metric-label">Fundación San Agustín</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOLBAR: Buscador (INP-01) y Filtro (BTN-01) -->
+  <section class="toolbar-section" id="rutas">
+    <div class="toolbar-container">
+      <!-- Fila 1: Campo de Búsqueda y Botón Modal de Filtros -->
+      <div class="toolbar-main">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="search" 
+            id="searchInput" 
+            class="input-search" 
+            placeholder="Buscar en Tapachula (ej. 'Hamburgo', 'Playa Linda', 'MUTAP', 'Cascada')..."
+            aria-label="Buscar atractivos de Tapachula"
+          >
+          <button id="clearSearchBtn" class="btn-clear is-hidden" aria-label="Limpiar búsqueda">&times;</button>
+        </div>
+
+        <button id="openFilterBtn" class="btn btn-filter" aria-haspopup="dialog">
+          <span>⚙️ Filtrar por Zona</span>
+          <span id="activeFiltersBadge" class="badge-filter is-hidden">0</span>
+        </button>
+      </div>
+
+      <!-- Fila 2: Chips de Categorías y Contador -->
+      <div class="toolbar-categories">
+        <div class="category-chips" id="categoryChips">
+          <button class="chip active" data-category="all">Todo Tapachula</button>
+          <button class="chip" data-category="culture">Centro & MUTAP</button>
+          <button class="chip" data-category="cafe">Ruta del Café (Sierra)</button>
+          <button class="chip" data-category="nature">Cascadas & Selva</button>
+          <button class="chip" data-category="costa">Playas & Puerto Chiapas</button>
+          <button class="chip" data-category="gastronomy">Tostadurías & Sabores</button>
+        </div>
+
+        <div class="results-info">
+          <span>Mostrando <strong id="resultsCount">0</strong> atractivos</span>
+          <button id="simulateErrorBtn" class="link-sim">Simular error</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CRD-01: Grid de Tarjetas de Destinos -->
+  <section class="spots-section">
+    <div class="section-container">
+      <div class="section-header">
+        <div>
+          <span class="section-kicker">Municipio de Tapachula</span>
+          <h2 class="section-title">Atractivos Urbanos y Rurales</h2>
+        </div>
+        <p class="section-subtitle">Haz clic en cualquier tarjeta para ver historia, vestimenta recomendada y cómo llegar.</p>
+      </div>
+
+      <!-- Estado: Cargando Skeletons -->
+      <div class="cards-grid is-hidden" id="skeletonGrid">
+        <div class="card-skeleton">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line w-40"></div>
+            <div class="skeleton-line w-80"></div>
+            <div class="skeleton-line w-60"></div>
+          </div>
+        </div>
+        <div class="card-skeleton">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line w-40"></div>
+            <div class="skeleton-line w-80"></div>
+            <div class="skeleton-line w-60"></div>
+          </div>
+        </div>
+        <div class="card-skeleton">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line w-40"></div>
+            <div class="skeleton-line w-80"></div>
+            <div class="skeleton-line w-60"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado: Lista Vacía -->
+      <div class="empty-state is-hidden" id="emptyState">
+        <div class="empty-icon">📍</div>
+        <h3 class="empty-title">No se encontraron atractivos</h3>
+        <p class="empty-text">No hay resultados que coincidan con tu búsqueda en el municipio de Tapachula.</p>
+        <button id="resetSearchBtn" class="btn btn-secondary">Restablecer Búsqueda</button>
+      </div>
+
+      <!-- Grid Principal de Tarjetas (CRD-01) -->
+      <div class="cards-grid" id="cardsGrid"></div>
+    </div>
+  </section>
+
+  <!-- MAPA INTERACTIVO: Ejes del Municipio -->
+  <section class="map-section" id="mapa">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-kicker">Conectividad y Traslados</span>
+        <h2 class="section-title">Ejes Territoriales de Tapachula</h2>
+        <p class="section-subtitle">Tiempos y distancias oficiales partiendo desde el Parque Central Miguel Hidalgo.</p>
+      </div>
+
+      <div class="map-layout">
+        <!-- Esquema Visual de Ejes -->
+        <div class="map-visual">
+          <div class="map-header">
+            <span>🗺️ Rutas de Tapachula: Sierra, Casco Urbano y Costa</span>
+            <span class="map-tag">Punto Cero: Centro</span>
+          </div>
+
+          <div class="map-nodes">
+            <div class="map-node" onclick="openSpotById('ruta-del-cafe-tapachula')">
+              <div class="node-icon cafe">☕</div>
+              <div class="node-info">
+                <span class="node-direction">Eje Norte (Sierra Rural)</span>
+                <strong class="node-name">Ruta del Café (Hamburgo, Argovia, Irlanda)</strong>
+                <span class="node-meta">38 - 48 km · Bosque de niebla · Altitud 1,250m</span>
+              </div>
+              <span class="node-action">Ver ficha →</span>
+            </div>
+
+            <div class="map-node" onclick="openSpotById('cascada-san-francisco')">
+              <div class="node-icon waterfall">💧</div>
+              <div class="node-info">
+                <span class="node-direction">Eje Noroeste (Ecoturismo Rural)</span>
+                <strong class="node-name">Cascadas de San Francisco</strong>
+                <span class="node-meta">32 km · Pozas naturales de manantial</span>
+              </div>
+              <span class="node-action">Ver ficha →</span>
+            </div>
+
+            <div class="map-node hub" onclick="openSpotById('parque-central-mutap')">
+              <div class="node-icon center">🏛️</div>
+              <div class="node-info">
+                <span class="node-direction">Centro Urbano (Cabecera)</span>
+                <strong class="node-name">Parque Central Miguel Hidalgo & MUTAP</strong>
+                <span class="node-meta">0 km · Marimba, tostadurías urbanas y Parroquia San Agustín</span>
+              </div>
+              <span class="node-action">Ver ficha →</span>
+            </div>
+
+            <div class="map-node" onclick="openSpotById('puerto-chiapas-playa-linda')">
+              <div class="node-icon coast">🌊</div>
+              <div class="node-info">
+                <span class="node-direction">Eje Sur (Zona Costera)</span>
+                <strong class="node-name">Puerto Chiapas & Playa Linda</strong>
+                <span class="node-meta">28 km · 25-30 min · Malecón turístico, mariscos y esteros</span>
+              </div>
+              <span class="node-action">Ver ficha →</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guía de Movilidad -->
+        <div class="map-guide">
+          <h3>Guía Práctica de Traslado</h3>
+          <p>Los colectivos a la sierra y a la costa operan desde las 6:00 AM en las terminales del centro de Tapachula.</p>
+          
+          <div class="guide-item">
+            <strong>Ruta de la Sierra:</strong>
+            <p>Carretera Tapachula - Nueva Alemania. Pavimentada con curvas panorámicas.</p>
+          </div>
+
+          <div class="guide-item">
+            <strong>Ruta a la Costa:</strong>
+            <p>Autopista de 4 carriles a Puerto Madero (25 minutos). Conexión con Playa Linda y Barra de San Benito.</p>
+          </div>
+
+          <div class="guide-airport">
+            <strong>✈️ Aeropuerto Internacional de Tapachula (TAP):</strong>
+            <p>A solo 18 km al sur sobre la carretera a Puerto Madero, dentro del mismo municipio.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIRECTORIO: Negocios Locales de Tapachula -->
+  <section class="directory-section" id="directorio">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-kicker">Comercio & Hospitalidad</span>
+        <h2 class="section-title">Directorio de Servicios en Tapachula</h2>
+        <p class="section-subtitle">Hoteles, cafeterías con tueste propio, restaurantes tradicionales y transporte en el municipio.</p>
+      </div>
+
+      <div class="directory-grid" id="directoryGrid"></div>
+    </div>
+  </section>
+
+  <!-- CULTURA: Marimba, Café y Tradiciones -->
+  <section class="culture-section" id="cultura">
+    <div class="section-container">
+      <div class="culture-layout">
+        <div class="culture-image-card">
+          <img src="images/gastronomia-cafe.jpg" alt="Café de especialidad de Tapachula Soconusco" class="culture-img">
+          <div class="culture-image-caption">
+            <strong>Café de Estricta Altura & Marimba</strong>
+            <p>El corazón cultural y social de la frontera sur de Chiapas.</p>
+          </div>
+        </div>
+
+        <div class="culture-text">
+          <span class="section-kicker">Patrimonio del Municipio</span>
+          <h2 class="section-title">El Grano de Oro y el Hormiguillo</h2>
+          <p class="culture-lead">Tapachula combina la tradición cafetalera de montaña con las notas musicales de la marimba chiapaneca en sus plazas públicas.</p>
+
+          <div class="culture-feature">
+            <h3>☕ Capital Económica del Café</h3>
+            <p>La sierra de Tapachula es pionera en el cultivo de café arábigo bajo sombra de árboles nativos, protegiendo manantiales y aves tropicales.</p>
+          </div>
+
+          <div class="culture-feature">
+            <h3>🎶 Marimba al Atardecer</h3>
+            <p>Todos los días de 6:00 PM a 8:00 PM, la marimba municipal interpreta danzones y sones bajo el Kiosco del Parque Central Miguel Hidalgo.</p>
+          </div>
+
+          <div class="culture-feature">
+            <h3>🍌 Gastronomía Tapachulteca</h3>
+            <p>Plátanos rellenos de queso de bola, marquesote esponjoso, tascalate espumoso y botana tradicional servida al mediodía.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER: Pie de Página -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col brand">
+        <h3 class="footer-logo">Tapachula de Córdova y Ordóñez</h3>
+        <p class="footer-desc">
+          Portal turístico dedicado a los atractivos urbanos y rurales del municipio de Tapachula, Chiapas.
+        </p>
+        <span class="footer-location">📍 Chiapas, México · Frontera Sur</span>
+      </div>
+
+      <div class="footer-col">
+        <h4>Explorar</h4>
+        <ul class="footer-links">
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#rutas">Rutas del Café y Cascadas</a></li>
+          <li><a href="#mapa">Mapa de Ejes</a></li>
+          <li><a href="#directorio">Directorio Municipal</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Turismo Responsable</h4>
+        <p class="footer-desc">
+          Consume café de sombra local, apoya a los guías comunitarios y cuida las reservas naturales de la sierra y la costa de Tapachula.
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Tapachula Turística · Todos los derechos reservados.</p>
+      <p>Diseño web limpio, semántico y modular.</p>
+    </div>
+  </footer>
+
+  <!-- DLG-01: Modal de Filtros (Dialog) -->
+  <div class="modal-backdrop is-hidden" id="filterModal" role="dialog" aria-modal="true" aria-labelledby="filterModalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h3 id="filterModalTitle" class="modal-title">Filtros de Tapachula</h3>
+          <p class="modal-subtitle">Demarcación territorial y duración estimada</p>
+        </div>
+        <button id="closeFilterBtn" class="btn-modal-close" aria-label="Cerrar modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="filter-group">
+          <label class="filter-label">Zona Territorial del Municipio</label>
+          <div class="filter-options" id="zoneFilterOptions">
+            <button class="filter-opt active" data-zone="all">Todo el Municipio</button>
+            <button class="filter-opt" data-zone="centro_urbano">Centro Urbano (MUTAP, Kiosco, Tostadurías)</button>
+            <button class="filter-opt" data-zone="rural_sierra">Zona Rural Alta (Fincas y Cascadas)</button>
+            <button class="filter-opt" data-zone="rural_costa">Zona Rural Costera (Puerto Chiapas y Playa Linda)</button>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Tiempo Estimado de Visita</label>
+          <div class="filter-options" id="durationFilterOptions">
+            <button class="filter-opt active" data-duration="all">Cualquier duración</button>
+            <button class="filter-opt" data-duration="half_day">Medio día (2 a 4 hrs)</button>
+            <button class="filter-opt" data-duration="full_day">Día completo</button>
+            <button class="filter-opt" data-duration="multi_day">Estancia de 1 a 2 días (Cabañas)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="resetFiltersBtn" class="btn btn-secondary">Limpiar Filtros</button>
+        <button id="applyFiltersBtn" class="btn btn-primary">Aplicar y Ver Resultados</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Ficha Técnica Detallada del Destino -->
+  <div class="modal-backdrop is-hidden" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="spotDetailTitle">
+    <div class="modal-dialog modal-lg">
+      <div class="detail-header">
+        <img id="detailImg" src="" alt="" class="detail-hero-img">
+        <div class="detail-hero-overlay"></div>
+        <button id="closeDetailBtn" class="btn-detail-close" aria-label="Cerrar ficha">&times;</button>
+        <div class="detail-header-text">
+          <span id="detailKicker" class="detail-kicker"></span>
+          <h2 id="spotDetailTitle" class="detail-title"></h2>
+          <span id="detailLocation" class="detail-location"></span>
+        </div>
+      </div>
+
+      <div class="detail-body">
+        <div class="detail-facts-grid">
+          <div class="fact-item">
+            <span class="fact-label">Calificación</span>
+            <strong id="detailRating" class="fact-value"></strong>
+          </div>
+          <div class="fact-item">
+            <span class="fact-label">Duración</span>
+            <strong id="detailDuration" class="fact-value"></strong>
+          </div>
+          <div class="fact-item">
+            <span class="fact-label">Distancia Centro</span>
+            <strong id="detailDistance" class="fact-value"></strong>
+          </div>
+          <div class="fact-item">
+            <span class="fact-label">Dificultad</span>
+            <strong id="detailDifficulty" class="fact-value"></strong>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Sobre este lugar en Tapachula</h3>
+          <p id="detailDescription" class="detail-desc"></p>
+        </div>
+
+        <div class="detail-section">
+          <h3>Puntos Destacados</h3>
+          <ul id="detailHighlights" class="detail-list"></ul>
+        </div>
+
+        <div class="detail-transport-box">
+          <strong>🚗 Cómo llegar desde el Centro de Tapachula:</strong>
+          <p id="detailTransport"></p>
+        </div>
+
+        <div class="detail-tips-box">
+          <strong>💡 Consejos para el visitante:</strong>
+          <ul id="detailTips" class="tips-list"></ul>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="toggleSaveDetailBtn" class="btn btn-secondary">Guardar en Mi Itinerario</button>
+        <button id="closeDetailActionBtn" class="btn btn-primary">Cerrar Ficha</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRAWER: Mi Itinerario de Viaje -->
+  <aside class="drawer-backdrop is-hidden" id="itineraryDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div class="drawer-panel">
+      <div class="drawer-header">
+        <div>
+          <h3 id="drawerTitle" class="drawer-title">Mi Itinerario de Viaje</h3>
+          <span id="drawerSubtitle" class="drawer-subtitle">Destinos guardados de Tapachula</span>
+        </div>
+        <button id="closeDrawerBtn" class="btn-modal-close" aria-label="Cerrar itinerario">&times;</button>
+      </div>
+
+      <div class="drawer-body" id="itineraryItemsList"></div>
+
+      <div class="drawer-footer">
+        <button id="printItineraryBtn" class="btn btn-secondary w-full">Imprimir / Guardar en PDF</button>
+        <button id="clearItineraryBtn" class="btn-link text-danger">Vaciar itinerario</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Script JS -->
+  <script src="main.js"></script>
+</body>
+</html>
